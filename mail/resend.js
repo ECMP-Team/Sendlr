@@ -51,7 +51,7 @@ async function sendBulkEmail({ recipients, subject, text, html }) {
  */
 async function sendIndividualEmails(
   emailList,
-  fromEmail = "testing@resend.dev"
+  fromEmail = "yasser.dalali.personal@gmail.com"
 ) {
   console.log(`Sending ${emailList.length} individual emails`);
 
