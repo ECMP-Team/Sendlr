@@ -13,7 +13,8 @@
     "test:real": "node examples/realBatchTest.js --confirm-send",
     "test:simple": "node examples/simpleBatchTest.js",
     "test:client": "node examples/realClientTest.js",
-    "test:noai": "node examples/simpleNoAI.js"
+    "test:noai": "node examples/simpleNoAI.js",
+    "test:prisma": "node examples/prismaExample.js"
   },
   "dependencies": {
     "@google/genai": "^0.7.0",
