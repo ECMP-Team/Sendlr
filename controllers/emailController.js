@@ -1,5 +1,6 @@
 import { sendBulkEmail, sendIndividualEmails } from "../mail/resend.js";
 import writeMail from "../api/mailWriter.js";
+import { logEmailSent } from "../utils/prismaUtils.js";
 
 class emailController {
 /**
@@ -147,17 +148,32 @@ static async  generateAndSendEmails(req, res)  {
       text: content.text,
       html: content.html,
     }));
-
+    
     // Send individual emails
     const results = await sendIndividualEmails(
       emails,
       fromEmail || "testing@resend.dev"
     );
 
+    // Log sent emails to database
+    const emailLogs = await Promise.all(
+      emails.map(async (email, index) => {
+        const status = results.results[index].success ? 'SENT' : 'FAILED';
+        return logEmailSent({
+          recipientMail: email.recipient,
+          emailContent: email.text || email.html,
+          status,
+          userId: "1462334612456", // TODO : Fixed user ID for now, replace with actual user ID in production
+          campaignId: null, // TODO : Add campaign ID if applicable
+        });
+      })
+    );
+
     return res.json({
       success: true,
       message: `Generated and sent ${results.successful} emails, ${results.failed} failed`,
       results,
+      logs: emailLogs
     });
   } catch (error) {
     console.error("Error in /api/generate-and-send:", error);
