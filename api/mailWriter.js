@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AI_API } from "../config/config.js";
-const genAI = new GoogleGenerativeAI(apiKey);
-const apiKey = AI_API;
+const genAI = new GoogleGenerativeAI(AI_API);
 
 // Use the latest model
 const model = genAI.getGenerativeModel({

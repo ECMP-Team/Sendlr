@@ -1,5 +1,5 @@
 import express from 'express';
-import emailController, { sendBulkEmails, sendIndividualEmails, generateAndSendEmails } from './controllers/emailController.js';
+import emailController from './controllers/emailController.js';
 import { healthCheck } from './controllers/healthController.js';
 
 const app = express();
