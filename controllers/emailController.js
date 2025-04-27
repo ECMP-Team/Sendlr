@@ -1,8 +1,23 @@
 import { sendBulkEmail, sendIndividualEmails } from "../mail/resend.js";
 import writeMail from "../api/mailWriter.js";
 
-// Endpoint to send the same email to multiple recipients
-export const sendBulkEmails = async (req, res) => {
+class emailController {
+/**
+ * Sends bulk emails to a list of recipients.
+ *
+ * @async
+ * @function sendBulkEmails
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.body - The request body containing email details.
+ * @param {string[]} req.body.recipients - An array of recipient email addresses.
+ * @param {string} req.body.subject - The subject of the email.
+ * @param {string} [req.body.text] - The plain text content of the email.
+ * @param {string} [req.body.html] - The HTML content of the email.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} Sends a JSON response indicating success or failure.
+ * @throws {Error} Returns a 500 status code with an error message if an exception occurs.
+ */
+static async sendBulkEmails(req, res)  {
   try {
     const { recipients, subject, text, html } = req.body;
     
@@ -38,7 +53,7 @@ export const sendBulkEmails = async (req, res) => {
 };
 
 // Endpoint to send individual emails with different content to each recipient
-export const sendIndividualEmails = async (req, res) => {
+static async  sendIndividualEmails(req, res)  {
   try {
     const { emails, fromEmail } = req.body;
 
@@ -95,7 +110,23 @@ export const sendIndividualEmails = async (req, res) => {
 };
 
 // Endpoint to generate AI email content and send individualized emails
-export const generateAndSendEmails = async (req, res) => {
+/**
+ * Generates email content for a list of clients and sends the emails.
+ *
+ * @async
+ * @function generateAndSendEmails
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The body of the request.
+ * @param {Array<Object>} req.body.clientData - An array of client data objects, each containing at least an `email` property.
+ * @param {string} [req.body.fromEmail] - The sender's email address. Defaults to "testing@resend.dev" if not provided.
+ * @param {string} req.body.prompt - The prompt used to generate email content.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} Sends a JSON response with the status and results of the email generation and sending process.
+ *
+ * @throws {Error} Returns a 400 status if `clientData` is missing, not an array, or empty.
+ * @throws {Error} Returns a 500 status if an error occurs during email generation or sending.
+ */
+static async  generateAndSendEmails(req, res)  {
   try {
     const { clientData, fromEmail, prompt } = req.body;
 
@@ -137,3 +168,6 @@ export const generateAndSendEmails = async (req, res) => {
     });
   }
 }; 
+}
+
+export default emailController;
