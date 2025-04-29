@@ -1,0 +1,189 @@
+import { sendBulkEmail, sendIndividualEmails } from "../mail/resend.js";
+import writeMail from "../api/mailWriter.js";
+import { logEmailSent } from "../utils/prismaUtils.js";
+
+class emailController {
+/**
+ * Sends bulk emails to a list of recipients.
+ *
+ * @async
+ * @function sendBulkEmails
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.body - The request body containing email details.
+ * @param {string[]} req.body.recipients - An array of recipient email addresses.
+ * @param {string} req.body.subject - The subject of the email.
+ * @param {string} [req.body.text] - The plain text content of the email.
+ * @param {string} [req.body.html] - The HTML content of the email.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} Sends a JSON response indicating success or failure.
+ * @throws {Error} Returns a 500 status code with an error message if an exception occurs.
+ */
+static async sendBulkEmails(req, res)  {
+  try {
+    const { recipients, subject, text, html } = req.body;
+    
+    if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an array of recipient email addresses",
+      });
+    }
+
+    if (!subject || (!text && !html)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide subject and either text or html content",
+      });
+    }
+
+    const result = await sendBulkEmail({ recipients, subject, text, html });
+
+    return res.json({
+      success: true,
+      message: "Emails sent successfully",
+      result,
+    });
+  } catch (error) {
+    console.error("Error in /api/send-bulk:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error sending emails",
+      error: error.message,
+    });
+  }
+};
+
+// Endpoint to send individual emails with different content to each recipient
+static async  sendIndividualEmails(req, res)  {
+  try {
+    const { emails, fromEmail } = req.body;
+
+    if (!emails || !Array.isArray(emails) || emails.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an array of email objects",
+      });
+    }
+
+    // Validate each email
+    const validationErrors = [];
+    emails.forEach((email, index) => {
+      if (!email.recipient) {
+        validationErrors.push(`Email at index ${index} is missing recipient`);
+      }
+      if (!email.subject) {
+        validationErrors.push(`Email at index ${index} is missing subject`);
+      }
+      if (!email.text && !email.html) {
+        validationErrors.push(
+          `Email at index ${index} is missing both text and html content`
+        );
+      }
+    });
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation errors",
+        errors: validationErrors,
+      });
+    }
+
+    // Send individual emails
+    const results = await sendIndividualEmails(
+      emails,
+      fromEmail || "testing@resend.dev"
+    );
+
+    return res.json({
+      success: true,
+      message: `Sent ${results.successful} emails, ${results.failed} failed`,
+      results,
+    });
+  } catch (error) {
+    console.error("Error in /api/send-individual:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error sending emails",
+      error: error.message,
+    });
+  }
+};
+
+// Endpoint to generate AI email content and send individualized emails
+/**
+ * Generates email content for a list of clients and sends the emails.
+ *
+ * @async
+ * @function generateAndSendEmails
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The body of the request.
+ * @param {Array<Object>} req.body.clientData - An array of client data objects, each containing at least an `email` property.
+ * @param {string} [req.body.fromEmail] - The sender's email address. Defaults to "testing@resend.dev" if not provided.
+ * @param {string} req.body.prompt - The prompt used to generate email content.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} Sends a JSON response with the status and results of the email generation and sending process.
+ *
+ * @throws {Error} Returns a 400 status if `clientData` is missing, not an array, or empty.
+ * @throws {Error} Returns a 500 status if an error occurs during email generation or sending.
+ */
+static async  generateAndSendEmails(req, res)  {
+  try {
+    const { clientData, fromEmail, prompt } = req.body;
+
+    if (!clientData || !Array.isArray(clientData) || clientData.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an array of client data objects",
+      });
+    }
+
+    // Generate email content for all clients using writeMail
+    const emailContents = await writeMail(prompt, clientData);
+
+    // Convert email contents to the format expected by sendIndividualEmails
+    const emails = emailContents.map((content, index) => ({
+      recipient: clientData[index].email,
+      subject: content.subject,
+      text: content.text,
+      html: content.html,
+    }));
+    
+    // Send individual emails
+    const results = await sendIndividualEmails(
+      emails,
+      fromEmail || "testing@resend.dev"
+    );
+
+    // Log sent emails to database
+    const emailLogs = await Promise.all(
+      emails.map(async (email, index) => {
+        const status = results.results[index].success ? 'SENT' : 'FAILED';
+        return logEmailSent({
+          recipientMail: email.recipient,
+          emailContent: email.text || email.html,
+          status,
+          userId: "1462334612456", // TODO : Fixed user ID for now, replace with actual user ID in production
+          campaignId: null, // TODO : Add campaign ID if applicable
+        });
+      })
+    );
+
+    return res.json({
+      success: true,
+      message: `Generated and sent ${results.successful} emails, ${results.failed} failed`,
+      results,
+      logs: emailLogs
+    });
+  } catch (error) {
+    console.error("Error in /api/generate-and-send:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error generating or sending emails",
+      error: error.message,
+    });
+  }
+}; 
+}
+
+export default emailController;
