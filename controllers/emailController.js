@@ -127,9 +127,11 @@ static async  sendIndividualEmails(req, res)  {
  * @throws {Error} Returns a 400 status if `clientData` is missing, not an array, or empty.
  * @throws {Error} Returns a 500 status if an error occurs during email generation or sending.
  */
-static async  generateAndSendEmails(req, res)  {
+static async generateAndSendEmails(req, res)  {
+  const userId = req.user.id;
+
   try {
-    const { clientData, fromEmail, prompt } = req.body;
+    const { campaignId, clientData, fromEmail, prompt } = req.body;
 
     if (!clientData || !Array.isArray(clientData) || clientData.length === 0) {
       return res.status(400).json({

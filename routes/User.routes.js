@@ -1,10 +1,12 @@
 import { Router } from "express";
 import UserController from "../controllers/userController.js";
+import authMiddleware from "../middleware/auth.middleware.js";
 const userRouter = Router();
 
 userRouter.get("/get-all-campaigns", authMiddleware, UserController.getAllCampaigns);
 userRouter.get("/get-campaigns/:id", authMiddleware, UserController.getCampaign);
 userRouter.get("/get-user/:id", authMiddleware, UserController.getUser);
+userRouter.put("/update-user", authMiddleware, UserController.updateUser);
 //! userRouter.get("/get-all-users/", authMiddleware, UserController.getAllUsers);
 
 userRouter.post("/create-campaign", authMiddleware, UserController.createCampaign);

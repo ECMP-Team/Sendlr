@@ -17,6 +17,7 @@ model User {
   id        String      @id @default(uuid())
   email     String      @unique
   name      String?
+  userData  Json?
   emails    EmailSent[]
   campaigns Campaign[]
   password  String

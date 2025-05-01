@@ -120,9 +120,9 @@ class UserController {
 
     static async registerUser(req, res) {
         try {
-            const { email, password, name } = req.body;
+            const { email, password, name, userData } = req.body;
 
-            if (!email || !password || !name) {
+            if (!email || !password || !name || !userData) {
                 return res.status(400).json({ message: "All fields are required" });
             }
 
@@ -139,7 +139,7 @@ class UserController {
             const hashedPassword = await bcrypt.hash(password, salt);
 
             const user = await prisma.user.create({
-                data: { email, password: hashedPassword, name }
+                data: { email, password: hashedPassword, name, userData }
             });
 
             if (!user) {
@@ -149,6 +149,36 @@ class UserController {
             const token = createToken({ id: user.id });
 
             res.status(201).json({ token });
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    static async updateUser(req, res) {
+        try {
+            const userId = req.user.id;
+            const { name, userData } = req.body;
+
+            if (!name || !userData) {
+                return res.status(400).json({ message: "Name and userData are required" });
+            }
+            
+            const user = await prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: { name, userData }
+            });
+
+            if (!user) {
+                return res.status(400).json({ message: "Failed to update user" });
+            }
+
+            res.status(200).json(user);
+            
+            
         }
         catch (error) {
             console.log(error);
