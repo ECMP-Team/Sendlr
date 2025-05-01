@@ -50,6 +50,7 @@ async function writeMail(customPrompt = "", clientDataArray = []) {
       // Create client data string for the prompt
       const clientDataString = JSON.stringify(clientData, null, 2);
 
+      
       const chatSession = model.startChat({
         generationConfig,
       });

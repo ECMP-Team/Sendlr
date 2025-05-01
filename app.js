@@ -12,11 +12,7 @@ app.post("/api/send-individual", emailController.sendIndividualEmails); // will 
 app.post("/api/generate-and-send", emailController.generateAndSendEmails);
 
 
-//TODO : Add a route to create a campaign in the database
-// This is a placeholder route, you should implement the actual logic in the controller
-app.post("/api/createCampaign", () => {
-  console.log("Campaign created");
-});
+app.use("/api/user/", userRouter);
 // Health check endpoint
 app.get("/api/health", healthCheck);
 
