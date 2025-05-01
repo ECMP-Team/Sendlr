@@ -6,18 +6,18 @@ import { motion } from "framer-motion";
 
 export const Navbar = () => {
   return (
-    <nav className="bg-dark-space py-2 px-6 sticky top-0 z-50 backdrop-blur-md border-b border-gray-800 border-opacity-40">
+    <nav className="bg-transparent rounded-3xl py-3 px-6 sticky top-0 z-50 backdrop-blur-md border-b border-gray-200 border-opacity-40">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="group">
           <motion.h1
-            className="text-xl font-medium flex items-center"
+            className="text-xl font-medium flex items-center tracking-tight"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            Campaign<span className="text-cyber-green">AI</span>
-            <span className="ml-2 h-1.5 w-1.5 rounded-full bg-cyber-green animate-pulse"></span>
+            Campaign<span className="text-cyber-blue">AI</span>
+            <span className="ml-2 h-1.5 w-1.5 rounded-full bg-cyber-blue animate-pulse"></span>
           </motion.h1>
         </Link>
 
@@ -25,19 +25,19 @@ export const Navbar = () => {
         <div className="hidden md:flex space-x-8">
           <Link
             href="/workflow"
-            className="text-text-primary text-sm minimal-underline"
+            className="text-text-primary text-sm minimal-underline font-medium"
           >
             Workflow
           </Link>
           <Link
             href="/demo"
-            className="text-text-primary text-sm minimal-underline"
+            className="text-text-primary text-sm minimal-underline font-medium"
           >
             Live Demo
           </Link>
           <Link
             href="/knowledge"
-            className="text-text-primary text-sm minimal-underline"
+            className="text-text-primary text-sm minimal-underline font-medium"
           >
             Knowledge
           </Link>
@@ -45,7 +45,9 @@ export const Navbar = () => {
 
         {/* CTA Button */}
         <Link href="/get-started">
-          <button className="btn-primary px-4 py-2 text-sm">Get Started</button>
+          <button className="btn-primary px-4 py-2 text-sm font-medium">
+            Get Started
+          </button>
         </Link>
 
         {/* Mobile Menu Button - Shows on small screens */}

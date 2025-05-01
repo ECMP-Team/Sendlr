@@ -87,14 +87,14 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="bg-dark-space border-t border-gray-800">
+    <footer className="bg-dark-space border-t border-gray-200">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-8 mb-12">
           {/* Logo and newsletter section */}
           <div className="md:col-span-2">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold">
-                Campaign<span className="text-cyber-green">AI</span>
+                Campaign<span className="text-cyber-blue">AI</span>
               </h1>
             </div>
             <p className="mt-4 text-base text-text-secondary max-w-xs">
@@ -110,7 +110,7 @@ export const Footer = () => {
                   type="email"
                   name="email"
                   id="email"
-                  className="bg-dark-secondary text-text-primary p-3 rounded-lg border border-gray-700 focus:border-cyber-green focus:outline-none w-full sm:w-64"
+                  className="bg-dark-secondary text-text-primary p-3 rounded-lg border border-gray-300 focus:border-cyber-blue focus:outline-none w-full sm:w-64"
                   placeholder="Enter your email"
                 />
                 <button
@@ -134,7 +134,7 @@ export const Footer = () => {
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-base text-text-secondary hover:text-cyber-green transition-colors duration-200"
+                      className="text-base text-text-secondary hover:text-cyber-blue transition-colors duration-200"
                     >
                       {link.name}
                     </Link>
@@ -153,7 +153,7 @@ export const Footer = () => {
               <li className="text-text-secondary">
                 <a
                   href="mailto:info@campaignai.com"
-                  className="hover:text-cyber-green transition-colors duration-200"
+                  className="hover:text-cyber-blue transition-colors duration-200"
                 >
                   info@campaignai.com
                 </a>
@@ -161,7 +161,7 @@ export const Footer = () => {
               <li className="text-text-secondary">
                 <a
                   href="tel:+1234567890"
-                  className="hover:text-cyber-green transition-colors duration-200"
+                  className="hover:text-cyber-blue transition-colors duration-200"
                 >
                   +1 (234) 567-890
                 </a>
@@ -176,13 +176,13 @@ export const Footer = () => {
         </div>
 
         {/* Social links and copyright */}
-        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="flex space-x-6 md:order-2 mb-4 md:mb-0">
             {socialLinks.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
-                className="text-text-secondary hover:text-cyber-green transition-colors duration-200"
+                className="text-text-secondary hover:text-cyber-blue transition-colors duration-200"
                 target="_blank"
                 rel="noopener noreferrer"
               >

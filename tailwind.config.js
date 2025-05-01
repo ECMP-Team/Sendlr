@@ -8,15 +8,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "dark-space": "#0A0A0A",
-        "dark-secondary": "#121212",
-        "cyber-green": "#00FF88",
-        "text-primary": "#FFFFFF",
-        "text-secondary": "#A0A0A0",
+        "dark-space": "#FFFFFF",
+        "dark-secondary": "#F5F7FA",
+        "cyber-blue": "#2541B2",
+        "text-primary": "#03256C",
+        "text-secondary": "#1768AC",
+        "accent-light": "#06BEE1",
+        "accent-dark": "#03256C",
       },
       fontFamily: {
-        "space-grotesk": ["Space Grotesk", "sans-serif"],
-        jetbrains: ["JetBrains Mono", "monospace"],
+        "geist-sans": ["var(--font-geist-sans)", "sans-serif"],
+        "geist-mono": ["var(--font-geist-mono)", "monospace"],
       },
       animation: {
         "glow-pulse": "glow-pulse 2s infinite",
@@ -24,8 +26,8 @@ module.exports = {
       },
       keyframes: {
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 5px #00FF88" },
-          "50%": { boxShadow: "0 0 20px #00FF88" },
+          "0%, 100%": { boxShadow: "0 0 5px #2541B2" },
+          "50%": { boxShadow: "0 0 20px #2541B2" },
         },
         "progress-wave": {
           "0%": { backgroundPosition: "0% 50%" },

@@ -118,12 +118,12 @@ const VisitorStat: React.FC<{
   value: string | number;
 }> = ({ label, value }) => (
   <motion.div
-    className="bg-dark-space/70 apple-radius-sm p-3 text-center hover:bg-dark-space/90 transition-colors duration-200 hover:border-cyber-green/30 border border-transparent"
+    className="bg-dark-secondary apple-radius-sm p-3 text-center hover:bg-dark-secondary/90 transition-colors duration-200 hover:border-cyber-blue/30 border border-gray-200"
     whileHover={{ y: -2 }}
     transition={{ type: "spring", stiffness: 300, damping: 15 }}
   >
     <p className="text-xs text-text-secondary mb-1">{label}</p>
-    <p className="text-xl font-mono text-cyber-green">{value}</p>
+    <p className="text-xl font-geist-mono text-cyber-blue">{value}</p>
   </motion.div>
 );
 
@@ -132,11 +132,11 @@ const MetricBadge: React.FC<{
   value: string;
 }> = ({ label, value }) => (
   <motion.span
-    className="text-xs bg-dark-space py-1.5 px-3 apple-radius-sm border border-gray-700 text-text-secondary hover:border-cyber-green/30 transition-colors duration-200"
+    className="text-xs bg-dark-secondary py-1.5 px-3 apple-radius-sm border border-gray-300 text-text-secondary hover:border-cyber-blue/30 transition-colors duration-200"
     whileHover={{ y: -2 }}
     transition={{ type: "spring", stiffness: 300, damping: 15 }}
   >
-    {label} <span className="text-white font-medium">{value}</span>
+    {label} <span className="text-text-primary font-medium">{value}</span>
   </motion.span>
 );
 
@@ -144,48 +144,50 @@ const VisitorProfile: React.FC<{
   visitorInfo: VisitorInfo;
 }> = ({ visitorInfo }) => (
   <div className="w-full md:w-1/3">
-    {/* Wojak meme image */}
-    <div className="w-48 h-48 mx-auto relative">
-      <div className="w-full h-full relative rounded-full overflow-hidden border-2 border-gray-700">
+    {/* Profile image */}
+    <div className="w-32 h-32 mx-auto relative">
+      <div className="w-full h-full relative rounded-full overflow-hidden border-2 border-gray-200 shadow-sm">
         <svg
           viewBox="0 0 200 200"
-          className="absolute inset-0 z-0 opacity-20"
+          className="absolute inset-0 z-0 opacity-10"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
             <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#00ff85" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#121212" stopOpacity="0.1" />
+              <stop offset="0%" stopColor="#2541B2" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#06BEE1" stopOpacity="0.1" />
             </linearGradient>
           </defs>
           <rect width="100%" height="100%" fill="url(#grad)" />
         </svg>
 
-        {/* Actual Wojak image */}
+        {/* Profile image */}
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-dark-secondary overflow-hidden">
           <img
-            src="https://upload.wikimedia.org/wikipedia/en/c/cc/Wojak_cropped.jpg"
-            alt="Wojak"
+            src="https://i.pravatar.cc/150?img=68"
+            alt="Visitor"
             className="w-full h-full object-cover object-center"
           />
         </div>
       </div>
 
-      {/* Pulse animation behind the Wojak */}
+      {/* Subtle animation behind the profile */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 rounded-full bg-cyber-green/5 animate-ping-slow"></div>
+        <div className="absolute inset-0 rounded-full bg-cyber-blue/5 animate-ping-slow"></div>
       </div>
     </div>
 
-    {/* Stats below Wojak */}
-    <div className="text-center mt-2">
-      <p className="text-cyber-green font-medium uppercase tracking-wide text-sm">
-        Visitor from {visitorInfo.country}
+    {/* Location info */}
+    <div className="text-center mt-4">
+      <p className="text-cyber-blue font-medium text-sm">
+        Visitor from{" "}
+        <span className="text-text-primary">{visitorInfo.country}</span>{" "}
+        <span className="text-xl">{visitorInfo.flag}</span>
       </p>
     </div>
 
     {/* Email statistics */}
-    <div className="mt-4 grid grid-cols-2 gap-3 max-w-xs mx-auto">
+    <div className="mt-6 grid grid-cols-2 gap-3 max-w-xs mx-auto">
       <VisitorStat label="Emails Sent" value={visitorInfo.emails} />
       <VisitorStat label="Open Rate" value={`${visitorInfo.openRate}%`} />
     </div>
@@ -205,15 +207,15 @@ const DetailTooltip: React.FC<{
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="bg-dark-space border border-cyber-green/30 shadow-lg shadow-cyber-green/10 p-0 apple-radius w-[270px] overflow-hidden">
+      <div className="bg-dark-space border border-gray-200 shadow-lg rounded-xl w-[270px] overflow-hidden">
         {/* Triangle pointer */}
-        <div className="absolute -top-2 right-6 w-3 h-3 bg-dark-space border-l border-t border-cyber-green/30 transform rotate-45"></div>
+        <div className="absolute -top-2 right-6 w-3 h-3 bg-dark-space border-l border-t border-gray-200 transform rotate-45"></div>
 
         {/* Header */}
-        <div className="px-4 py-3 bg-dark-space border-b border-gray-700 flex items-center justify-between">
+        <div className="px-4 py-3 bg-dark-space border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center">
             <svg
-              className="w-5 h-5 mr-2 text-cyber-green"
+              className="w-5 h-5 mr-2 text-cyber-blue"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -225,12 +227,12 @@ const DetailTooltip: React.FC<{
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span className="text-cyber-green text-xs uppercase tracking-wider font-medium">
+            <span className="text-cyber-blue text-xs uppercase tracking-wider font-medium">
               VISITOR DETAILS
             </span>
           </div>
           <div>
-            <span className="text-xs bg-dark-space/80 py-1 px-2 apple-radius-sm text-cyber-green border border-cyber-green/30">
+            <span className="text-xs bg-cyber-blue/10 py-1 px-2 rounded-full text-cyber-blue">
               ACTIVE
             </span>
           </div>
@@ -273,13 +275,13 @@ const TooltipRow: React.FC<{
 }> = ({ label, value, emoji, isLast = false }) => (
   <div
     className={`px-4 py-3 flex items-center justify-between ${
-      !isLast ? "border-b border-gray-800/50" : ""
+      !isLast ? "border-b border-gray-200" : ""
     }`}
   >
-    <span className="text-white text-sm">{label}</span>
+    <span className="text-text-primary text-sm">{label}</span>
     <div className="flex items-center">
-      <span className="text-cyber-green mr-2 text-xl">{emoji}</span>
-      <span className="text-white font-mono text-sm">{value}</span>
+      <span className="text-cyber-blue mr-2 text-xl">{emoji}</span>
+      <span className="text-text-primary font-geist-mono text-sm">{value}</span>
     </div>
   </div>
 );
@@ -290,48 +292,45 @@ const VisitorContent: React.FC<{
   setShowDetails: (show: boolean) => void;
 }> = ({ visitorInfo, showDetails, setShowDetails }) => (
   <div className="w-full md:w-2/3 text-left">
-    <h2 className="text-2xl md:text-3xl text-gray-300 mb-4 group relative">
+    <h2 className="text-2xl md:text-3xl text-text-primary mb-4 group relative">
       Hey,{" "}
       <span
-        className="text-white font-medium cursor-help relative inline-block border-b-2"
-        style={{
-          borderImage: "linear-gradient(to right, #00ff85, #00a3ff) 1",
-        }}
+        className="font-medium cursor-help relative inline-block border-b-2 border-cyber-blue/30"
         onMouseEnter={() => setShowDetails(true)}
         onMouseLeave={() => setShowDetails(false)}
       >
         {visitorInfo.name}
 
         <DetailTooltip visitorInfo={visitorInfo} isVisible={showDetails} />
-      </span>{" "}
-      from <span className="text-white">{visitorInfo.country}</span>{" "}
-      <span className="text-xl">{visitorInfo.flag}</span>
+      </span>
     </h2>
 
-    <h3 className="text-xl md:text-2xl text-gray-300 mb-4">
-      We are Yassine and Yasser, creators of CampaignAI. we grew{" "}
-      <span className="text-white font-medium">24 email lists</span> in 12
-      months.
+    <h3 className="text-xl md:text-2xl text-text-primary mb-6">
+      We are Yassine and Yasser, creators of CampaignAI. We've helped{" "}
+      <span className="font-medium">24 businesses</span> grow their email lists
+      in 12 months.
     </h3>
 
-    <p className="text-text-secondary mb-4">The most common questions I get:</p>
+    <p className="text-text-secondary mb-4">Common questions we receive:</p>
 
-    <ul className="space-y-2 mb-6">
-      <li className="text-gray-300 flex items-start gap-2">
-        <span className="text-cyber-green mt-1">→</span>
+    <ul className="space-y-3 mb-6">
+      <li className="text-text-primary flex items-start gap-2">
+        <span className="text-cyber-blue mt-1">→</span>
         <span>How can I increase my email open rates?</span>
       </li>
-      <li className="text-gray-300 flex items-start gap-2">
-        <span className="text-cyber-green mt-1">→</span>
+      <li className="text-text-primary flex items-start gap-2">
+        <span className="text-cyber-blue mt-1">→</span>
         <span>What's the best way to personalize campaigns?</span>
       </li>
     </ul>
 
-    <div className="bg-dark-space/40 p-4 apple-radius border border-gray-700 mb-4 group hover:border-cyber-green/30 transition-colors duration-300">
-      <p className="text-xl text-gray-300 font-medium group-hover:text-white transition-colors duration-300">
+    <div className="bg-dark-space p-4 rounded-lg border border-gray-200 mb-6 transition-all duration-300 hover:border-cyber-blue/30 hover:shadow-md">
+      <p className="text-xl text-text-primary">
         Answer:{" "}
-        <span className="text-cyber-green">AI-powered personalization</span> is
-        the key.
+        <span className="text-cyber-blue font-medium">
+          AI-powered personalization
+        </span>{" "}
+        is the key.
       </p>
     </div>
 
@@ -419,22 +418,28 @@ const VisitorStatsClient: React.FC = () => {
   }, [timeSpent]);
 
   return (
-    <div className="max-w-4xl mx-auto mt-40 mb-8">
-      <div className="flex items-center justify-center mb-6">
-        <div className="h-px flex-1 bg-cyber-green/40"></div>
-        <h3 className="text-lg font-medium mx-8 text-cyber-green">
-          Welcome, Current Visitor
-        </h3>
-        <div className="h-px flex-1 bg-cyber-green/40"></div>
-      </div>
-
+    <div className="max-w-4xl mx-auto mt-24 mb-16">
       <motion.div
-        className="bg-dark-space apple-radius p-8 border-2 border-dashed border-gray-700 relative overflow-hidden"
+        className="text-center mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
+        <h2 className="text-4xl font-medium mb-4 text-text-primary">
+          Welcome, Current Visitor
+        </h2>
+        <p className="text-text-secondary max-w-lg mx-auto">
+          We've tailored this experience just for you
+        </p>
+      </motion.div>
+
+      <motion.div
+        className="bg-dark-secondary rounded-xl shadow-sm border border-gray-200 overflow-hidden relative"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <div className="p-8 flex flex-col md:flex-row items-center gap-10 relative z-10">
           <VisitorProfile visitorInfo={visitorInfo} />
           <VisitorContent
             visitorInfo={visitorInfo}
@@ -449,17 +454,19 @@ const VisitorStatsClient: React.FC = () => {
 
 // Loading placeholder for SSR
 const VisitorStatsPlaceholder: React.FC = () => (
-  <div className="max-w-4xl mx-auto mt-40 mb-8">
-    <div className="flex items-center justify-center mb-6">
-      <div className="h-px flex-1 bg-cyber-green/40"></div>
-      <h3 className="text-lg font-medium mx-8 text-cyber-green">
+  <div className="max-w-4xl mx-auto mt-24 mb-16">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl font-medium mb-4 text-text-primary">
         Welcome, Current Visitor
-      </h3>
-      <div className="h-px flex-1 bg-cyber-green/40"></div>
+      </h2>
+      <p className="text-text-secondary max-w-lg mx-auto">
+        We're preparing your personalized experience
+      </p>
     </div>
-    <div className="bg-dark-space apple-radius p-8 border-2 border-dashed border-gray-700 relative overflow-hidden h-[500px] flex items-center justify-center">
+
+    <div className="bg-dark-secondary rounded-xl shadow-sm border border-gray-200 overflow-hidden relative h-[400px] flex items-center justify-center">
       <div className="text-center">
-        <div className="w-8 h-8 border-2 border-cyber-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-10 h-10 border-2 border-cyber-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-text-secondary">Loading visitor information...</p>
       </div>
     </div>

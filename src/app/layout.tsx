@@ -1,7 +1,8 @@
 import "../styles/globals.css";
 import type { Metadata } from "next";
-import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 
 export const metadata: Metadata = {
   title: "CampaignAI | Email Campaign Platform",
@@ -14,7 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-dark-space">
+    <html
+      lang="en"
+      className={`bg-dark-space ${GeistSans.variable} ${GeistMono.variable}`}
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -22,17 +26,8 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
       </head>
-      <body className="min-h-screen font-space-grotesk text-text-primary">
-        <Navbar />
+      <body className="min-h-screen font-geist-sans text-text-primary">
         <main>{children}</main>
         <Footer />
       </body>

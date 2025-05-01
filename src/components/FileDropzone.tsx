@@ -132,8 +132,8 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
         {...getRootProps()}
         className={`flex-1 h-full flex flex-col items-center justify-center p-6 border-2 apple-radius transition-colors duration-200 cursor-pointer ${
           isDragActive
-            ? "border-cyber-green border-dashed bg-cyber-green/5"
-            : "border-dashed border-gray-700 hover:border-cyber-green/50"
+            ? "border-cyber-blue border-dashed bg-cyber-blue/5"
+            : "border-dashed border-gray-300 hover:border-cyber-blue/50"
         } ${
           isGenerating || isProcessing ? "opacity-70 cursor-not-allowed" : ""
         }`}
@@ -145,13 +145,13 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              className="w-8 h-8 border-2 border-cyber-green border-t-transparent rounded-full mx-auto mb-3"
+              className="w-8 h-8 border-2 border-cyber-blue border-t-transparent rounded-full mx-auto mb-3"
             />
-            <p className="text-cyber-green">Processing your file...</p>
+            <p className="text-cyber-blue">Processing your file...</p>
           </div>
         ) : (
           <>
-            <div className="mb-4 text-cyber-green">
+            <div className="mb-4 text-cyber-blue">
               <svg
                 className="w-12 h-12 mx-auto"
                 fill="none"
@@ -177,70 +177,61 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
 
             <div className="w-full max-w-sm mx-auto px-2">
               <div className="flex items-center mb-2">
-                <div className="h-0.5 flex-grow bg-gray-800"></div>
+                <div className="h-0.5 flex-grow bg-gray-200"></div>
                 <span className="text-xs text-text-secondary mx-3">
                   COLUMNS
                 </span>
-                <div className="h-0.5 flex-grow bg-gray-800"></div>
+                <div className="h-0.5 flex-grow bg-gray-200"></div>
               </div>
 
               <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
                 <div className="flex items-center">
-                  <div className="w-1.5 h-1.5 bg-cyber-green mr-2"></div>
+                  <div className="w-1.5 h-1.5 bg-cyber-blue mr-2"></div>
                   <span>name</span>
                 </div>
 
                 <div className="flex items-center">
-                  <div className="w-1.5 h-1.5 bg-cyber-green mr-2"></div>
+                  <div className="w-1.5 h-1.5 bg-cyber-blue mr-2"></div>
                   <span>email</span>
                 </div>
 
                 <div className="flex items-center">
-                  <div className="w-1.5 h-1.5 bg-cyber-green mr-2"></div>
+                  <div className="w-1.5 h-1.5 bg-cyber-blue mr-2"></div>
                   <span>company</span>
                 </div>
 
-                <div className="flex items-center text-text-secondary">
-                  <div className="w-1.5 h-1.5 bg-gray-600 mr-2"></div>
-                  <span>domain</span>
+                <div className="flex items-center">
+                  <div className="w-1.5 h-1.5 bg-accent-light mr-2"></div>
+                  <span className="text-text-secondary">domain</span>
                 </div>
 
-                <div className="flex items-center text-text-secondary">
-                  <div className="w-1.5 h-1.5 bg-gray-600 mr-2"></div>
-                  <span>notes</span>
+                <div className="flex items-center">
+                  <div className="w-1.5 h-1.5 bg-accent-light mr-2"></div>
+                  <span className="text-text-secondary">notes</span>
                 </div>
               </div>
             </div>
+
+            {error && (
+              <div className="mt-4 text-red-500 text-sm text-center">
+                {error}
+              </div>
+            )}
+
+            <div className="mt-4">
+              <button
+                type="button"
+                className="text-sm text-cyber-blue hover:underline focus:outline-none"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  downloadSampleTemplate();
+                }}
+              >
+                Download sample template
+              </button>
+            </div>
           </>
         )}
-
-        {error && (
-          <div className="mt-3 text-red-400 text-sm bg-red-900/20 px-3 py-2 apple-radius border-2 border-red-800">
-            {error}
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-center mt-3">
-        <button
-          onClick={downloadSampleTemplate}
-          className="text-xs bg-dark-secondary text-cyber-green py-1.5 px-3 border-2 border-gray-800 apple-radius-sm hover:bg-dark-secondary/70 flex items-center gap-1.5 transition-colors"
-        >
-          <svg
-            className="w-3.5 h-3.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
-          </svg>
-          Download Sample Template
-        </button>
       </div>
     </div>
   );

@@ -176,7 +176,7 @@ export default function Home() {
         <div className="container relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-medium mb-4">
-              <span className="text-cyber-green">
+              <span className="text-cyber-blue">
                 AI Email Campaign Generator
               </span>
             </h2>
@@ -187,8 +187,8 @@ export default function Home() {
           </div>
 
           <div className="split-panel-grid mb-24">
-            <div className="left-panel bg-dark-space border-2 border-dashed border-gray-700 apple-radius">
-              <h3 className="text-xl font-medium mb-6 text-cyber-green">
+            <div className="left-panel bg-dark-space border-2 border-dashed border-gray-300 apple-radius">
+              <h3 className="text-xl font-medium mb-6 text-cyber-blue">
                 Lead Data
               </h3>
               <FileDropzone
@@ -196,195 +196,54 @@ export default function Home() {
                 isGenerating={isGenerating}
               />
             </div>
-            <div className="right-panel bg-dark-space border-2 border-dashed border-gray-700 apple-radius">
-              <h3 className="text-xl font-medium mb-6 text-cyber-green flex justify-between items-center">
-                <span>AI Email Generator</span>
-                {emailContent.html && !isGenerating && (
+            <div className="right-panel bg-dark-space border-2 border-dashed border-gray-300 apple-radius">
+              <h3 className="text-xl font-medium mb-6 text-cyber-blue flex justify-between items-center">
+                <span>Generated Email</span>
+                {selectedLead && (
                   <button
-                    className="text-xs bg-dark-secondary text-cyber-green py-1.5 px-3 border apple-radius-sm hover:bg-dark-secondary/70 flex items-center gap-1.5 transition-colors"
-                    onClick={() =>
-                      window.open(
-                        `data:text/html;charset=utf-8,${encodeURIComponent(
-                          emailContent.html || ""
-                        )}`,
-                        "_blank"
-                      )
-                    }
+                    onClick={handleRegenerateClick}
+                    className="text-sm flex items-center gap-1 text-text-secondary hover:text-cyber-blue"
+                    disabled={isGenerating}
                   >
                     <svg
-                      className="w-3.5 h-3.5"
+                      className={`w-4 h-4 ${
+                        isGenerating ? "animate-spin" : ""
+                      }`}
                       fill="none"
-                      viewBox="0 0 24 24"
                       stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        strokeWidth={1.5}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                       />
                     </svg>
-                    Preview Email
+                    {isGenerating ? "Regenerating..." : "Regenerate"}
                   </button>
                 )}
               </h3>
-              <div className="flex-1">
-                <AIPreviewPanel
-                  emailContent={
-                    emailContent.html
-                      ? {
-                          subject: emailContent.subject || "",
-                          content: emailContent.html || "",
-                        }
-                      : null
-                  }
-                  isGenerating={isGenerating}
-                  onRegenerateClick={handleRegenerateClick}
-                  onEditContent={(subject, content) =>
-                    handleEditContent({
-                      subject,
-                      html: content,
-                      text: content.replace(/<[^>]*>?/gm, ""),
-                    })
-                  }
-                />
-              </div>
+              <AIPreviewPanel
+                selectedLead={selectedLead}
+                isGenerating={isGenerating}
+                emailContent={emailContent}
+                onSendEmail={sendEmail}
+                onSendBulkEmails={sendBulkEmails}
+                sendingStatus={sendingStatus}
+                onEditContent={handleEditContent}
+                totalLeads={leads.length}
+              />
             </div>
           </div>
 
-          {/* Email Features FAQ */}
-          <div className="mt-20 max-w-4xl mx-auto">
-            <div className="flex items-center mb-10">
-              <div className="h-px flex-1 bg-gray-800"></div>
-              <h3 className="text-lg font-medium mx-8 text-cyber-green">
-                What's included
-              </h3>
-              <div className="h-px flex-1 bg-gray-800"></div>
-            </div>
+          {/* Testimonials section */}
+          <Testimonials />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex gap-4 items-start">
-                <div className="flex-shrink-0 h-10 w-10 bg-dark-space border-2 border-gray-700 apple-radius-sm flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-cyber-green"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-white mb-2">
-                    Personalized Greeting
-                  </h4>
-                  <p className="text-text-secondary text-sm">
-                    Each email automatically includes the recipient's name and
-                    company details
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="flex-shrink-0 h-10 w-10 bg-dark-space border-2 border-gray-700 apple-radius-sm flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-cyber-green"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-white mb-2">
-                    Company-Specific Content
-                  </h4>
-                  <p className="text-text-secondary text-sm">
-                    AI generates relevant content based on the company profile
-                    and domain
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="flex-shrink-0 h-10 w-10 bg-dark-space border-2 border-gray-700 apple-radius-sm flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-cyber-green"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-white mb-2">
-                    Compelling Call to Action
-                  </h4>
-                  <p className="text-text-secondary text-sm">
-                    Strong, clear CTA designed to maximize response rates
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="flex-shrink-0 h-10 w-10 bg-dark-space border-2 border-gray-700 apple-radius-sm flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-cyber-green"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-white mb-2">
-                    Professional Formatting
-                  </h4>
-                  <p className="text-text-secondary text-sm">
-                    Clean HTML structure that renders properly across all email
-                    clients
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Visitor Stats */}
+          {/* Stats section */}
           <VisitorStats />
         </div>
       </section>
-
-      {/* Testimonials Section with more spacing */}
-      <Testimonials />
     </div>
   );
 }
