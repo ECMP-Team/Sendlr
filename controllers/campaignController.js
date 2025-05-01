@@ -1,3 +1,5 @@
+import prisma from "../prisma/prismaClient.js";
+
 class CampaignController {
     static async getAllCampaigns(req, res) {
         try {
@@ -33,7 +35,8 @@ class CampaignController {
             if (!campaign) {
                 return res.status(404).json({ message: "Campaign not found" });
             }
-
+            
+            return res.status(200).json(campaign);
         }
         catch (error) {
             console.log(error);

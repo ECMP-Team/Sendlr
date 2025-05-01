@@ -2,11 +2,11 @@
   "name": "email-service",
   "version": "1.0.0",
   "description": "Email sending application using Nodemailer",
-  "main": "mail/nodemail.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon app.js",
-    "start": "node mail/nodemail.js",
+    "start": "node app.js",
     "api": "node app.js",
     "example": "node examples/bulkIndividualExample.js",
     "test:batch": "node examples/testBulkSend.js",
