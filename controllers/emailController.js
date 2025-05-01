@@ -200,6 +200,9 @@ static async generateAndSendEmails(req, res)  {
     });
   }
 }; 
+
+
+
 }
 
 export default emailController;
