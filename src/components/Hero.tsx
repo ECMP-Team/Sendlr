@@ -39,15 +39,34 @@ export const Hero = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const gridPattern = {
+    backgroundSize: "30px 30px",
+    backgroundImage:
+      "linear-gradient(to right, rgba(255, 255, 255, 0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 1px, transparent 1px)",
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 1,
+    zIndex: 0,
+  };
+
   return (
     <section className="pt-0 pb-24 bg-dark-space relative overflow-hidden">
       <div
-        className="bg-gradient-to-b from-[#1768AC]/5 via-[#1768AC]/10 to-[#1768AC]/20 m-10 rounded-3xl shadow-sm relative"
+        className="bg-gradient-to-b from-[#1768AC]/5 via-[#1768AC]/10 to-[#1768AC]/25 m-10 rounded-3xl shadow-sm relative"
         style={{ minHeight: "950px" }}
       >
-        <Navbar />
+        {/* Grid pattern overlay */}
+        <div style={gridPattern}></div>
 
-        <div className="container relative z-[5] pt-12 pb-28">
+        {/* Navbar inside the gradient background */}
+        <div className="relative z-10">
+          <Navbar />
+        </div>
+
+        <div className="container relative z-10 pt-12 pb-28">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -101,22 +120,35 @@ export const Hero = () => {
               existing lead data.
             </motion.p>
             <motion.div
-              className="flex flex-wrap justify-center gap-4"
+              className="flex flex-wrap justify-center"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <a
                 href="#upload"
-                className="px-4 py-2 bg-cyber-blue text-white font-medium rounded-lg shadow-neon hover-glow text-sm"
+                className="px-8 py-4 bg-cyber-blue text-white font-semibold rounded-xl shadow-lg text-lg relative overflow-hidden hover:scale-105 transition-transform duration-300"
+                style={{
+                  boxShadow: "0 4px 15px rgba(6, 190, 225, 0.35)",
+                }}
               >
-                Start Now
-              </a>
-              <a
-                href="#learn-more"
-                className="px-4 py-2 border border-gray-300 text-text-primary rounded-lg hover:border-cyber-blue/50 transition-colors duration-300 text-sm font-medium"
-              >
-                Learn More
+                <span className="flex items-center">
+                  Start Now
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 ml-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </span>
               </a>
             </motion.div>
           </div>
@@ -124,22 +156,22 @@ export const Hero = () => {
       </div>
 
       <div
-        className="container mx-auto px-4 md:px-6"
+        className="container mx-auto px-4 md:px-6 relative z-30"
         style={{ marginTop: "-30%" }}
       >
         <div
-          className="perspective-container"
+          className="perspective-container relative z-30"
           style={{ perspective: "1000px" }}
         >
           <motion.div
-            className="flex justify-center"
+            className="flex justify-center relative z-30"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div
               ref={videoContainerRef}
-              className="w-full max-w-6xl rounded-2xl overflow-hidden relative transform-container"
+              className="w-full max-w-6xl rounded-2xl overflow-hidden relative transform-container z-30"
               style={{
                 boxShadow: `
                   0 0 20px rgba(37, 65, 178, 0.3),
