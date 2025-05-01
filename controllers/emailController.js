@@ -118,34 +118,48 @@ static async  sendIndividualEmails(req, res)  {
  * @function generateAndSendEmails
  * @param {Object} req - The request object.
  * @param {Object} req.body - The body of the request.
- * @param {Array<Object>} req.body.clientData - An array of client data objects, each containing at least an `email` property.
+ * @param {Array<Object>} req.body.userData - An array of client data objects, each containing at least an `email` property.
  * @param {string} [req.body.fromEmail] - The sender's email address. Defaults to "testing@resend.dev" if not provided.
  * @param {string} req.body.prompt - The prompt used to generate email content.
  * @param {Object} res - The response object.
  * @returns {Promise<void>} Sends a JSON response with the status and results of the email generation and sending process.
  *
- * @throws {Error} Returns a 400 status if `clientData` is missing, not an array, or empty.
+ * @throws {Error} Returns a 400 status if `userData` is missing, not an array, or empty.
  * @throws {Error} Returns a 500 status if an error occurs during email generation or sending.
  */
 static async generateAndSendEmails(req, res)  {
   const userId = req.user.id;
 
   try {
-    const { campaignId, clientData, fromEmail, prompt } = req.body;
+    const { campaignId, userData, fromEmail, prompt } = req.body;
 
-    if (!clientData || !Array.isArray(clientData) || clientData.length === 0) {
+    if (!userData || !Array.isArray(userData) || userData.length === 0) {
       return res.status(400).json({
         success: false,
         message: "Please provide an array of client data objects",
       });
     }
 
+    const campaign = await prisma.campaign.findUnique({
+      where: {
+        id: campaignId,
+        userId: userId
+      }
+    });
+
+    if (!campaign) {
+      return res.status(404).json({
+        success: false,
+        message: "Campaign not found",
+      });
+    }
+
     // Generate email content for all clients using writeMail
-    const emailContents = await writeMail(prompt, clientData);
+    const emailContents = await writeMail(prompt, userData);
 
     // Convert email contents to the format expected by sendIndividualEmails
     const emails = emailContents.map((content, index) => ({
-      recipient: clientData[index].email,
+      recipient: userData[index].email,
       subject: content.subject,
       text: content.text,
       html: content.html,
@@ -165,8 +179,8 @@ static async generateAndSendEmails(req, res)  {
           recipientMail: email.recipient,
           emailContent: email.text || email.html,
           status,
-          userId: "1462334612456", // TODO : Fixed user ID for now, replace with actual user ID in production
-          campaignId: null, // TODO : Add campaign ID if applicable
+          userId: userId, 
+          campaignId: campaignId,
         });
       })
     );
