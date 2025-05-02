@@ -2,6 +2,8 @@ import { sendBulkEmail, sendIndividualEmails } from "../mail/resend.js";
 import writeMail from "../api/mailWriter.js";
 import { logEmailSent } from "../utils/prismaUtils.js";
 import { parseFile } from "../utils/excelParser.js";
+import chalk from "chalk";
+import prisma from "../prisma/prismaClient.js";
 
 class emailController {
   /**
@@ -132,7 +134,12 @@ class emailController {
     const userId = req.user.id;
 
     try {
-      const { campaignId, userData, fromEmail, prompt } = req.body;
+      const { 
+        campaignId, 
+        userData, // array of objects containing email for each client and free data
+        fromEmail, // optional, default is "testing@resend.dev"
+        prompt // optional
+        } = req.body;
 
       if (!userData || !Array.isArray(userData) || userData.length === 0) {
         return res.status(400).json({
@@ -141,13 +148,14 @@ class emailController {
         });
       }
 
+      //---------------------------------------------
+      //? check if campaign exists
       const campaign = await prisma.campaign.findUnique({
         where: {
           id: campaignId,
           userId: userId
         }
       });
-
       if (!campaign) {
         return res.status(404).json({
           success: false,
@@ -155,36 +163,29 @@ class emailController {
         });
       }
 
+      //---------------------------------------------
       // Generate email content for all clients using writeMail
-      const emailContents = await writeMail(prompt, userData);
 
-      // Convert email contents to the format expected by sendIndividualEmails
-      const emails = emailContents.map((content, index) => ({
-        recipient: userData[index].email,
-        subject: content.subject,
-        text: content.text,
-        html: content.html,
-      }));
+      userData.forEach(async (user) => {   
+        const emailContent = await writeMail(prompt, user);
+        chalk.blue.bgYellow(`Generated email for ${user.email}: ${emailContent}`);
+        
+        //? send email
+        const results = await sendIndividualEmails(
+          [user.email],
+          fromEmail || "testing@resend.dev"
+        );
 
-      // Send individual emails
-      const results = await sendIndividualEmails(
-        emails,
-        fromEmail || "testing@resend.dev"
-      );
+        //? log email
+        await logEmailSent({
+          recipientMail: user.email,
+          emailContent: emailContent,
+          status: results.successful ? 'SENT' : 'FAILED',
+          userId: userId,
+          campaignId: campaignId,
+        });
+      });
 
-      // Log sent emails to database
-      const emailLogs = await Promise.all(
-        emails.map(async (email, index) => {
-          const status = results.results[index].success ? 'SENT' : 'FAILED';
-          return logEmailSent({
-            recipientMail: email.recipient,
-            emailContent: email.text || email.html,
-            status,
-            userId: userId,
-            campaignId: campaignId,
-          });
-        })
-      );
 
       return res.json({
         success: true,

@@ -9,5 +9,3 @@ const emailRouter = Router();
 emailRouter.post("/generate-and-send", authMiddleware, emailController.generateAndSendEmails);
 emailRouter.post("/excel-to-json", emailController.convertToJson);
 export default emailRouter;
-
-

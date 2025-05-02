@@ -15,4 +15,5 @@ const verifyToken = (token) => {
     return jwt.verify(formatedToken, JWT_SECRET);
 }
 
+
 export { createToken, verifyToken };

@@ -45,17 +45,16 @@ class CampaignController {
 
     static async createCampaign(req, res) {
         try {
-
-
             const userId = req.user.id;
             const { name, description } = req.body;
 
             if (!name || !description) {
                 return res.status(400).json({ message: "Name and description are required" });
             }
-            const campaignExists = await prisma.campaign.findUnique({
+            const campaignExists = await prisma.campaign.findFirst({
                 where: {
-                    name: name
+                    name,
+                    userId
                 }
             });
             if (campaignExists) {
