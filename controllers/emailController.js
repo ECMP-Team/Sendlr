@@ -2,6 +2,7 @@ import { sendBulkEmail, sendIndividualEmails } from "../mail/resend.js";
 import writeMail from "../api/mailWriter.js";
 import { logEmailSent } from "../utils/prismaUtils.js";
 import { parseFile } from "../utils/excelParser.js";
+import { processBatchEmails } from "../utils/emailUtils.js";
 import chalk from "chalk";
 import prisma from "../prisma/prismaClient.js";
 
@@ -139,7 +140,7 @@ class emailController {
         userData, // array of objects containing email for each client and free data
         fromEmail, // optional, default is "testing@resend.dev"
         prompt // optional
-        } = req.body;
+      } = req.body;
 
       if (!userData || !Array.isArray(userData) || userData.length === 0) {
         return res.status(400).json({
@@ -148,14 +149,14 @@ class emailController {
         });
       }
 
-      //---------------------------------------------
-      //? check if campaign exists
+      // Check if campaign exists
       const campaign = await prisma.campaign.findUnique({
         where: {
           id: campaignId,
           userId: userId
         }
       });
+      
       if (!campaign) {
         return res.status(404).json({
           success: false,
@@ -163,35 +164,34 @@ class emailController {
         });
       }
 
-      //---------------------------------------------
-      // Generate email content for all clients using writeMail
-
-      userData.forEach(async (user) => {   
-        const emailContent = await writeMail(prompt, user);
-        chalk.blue.bgYellow(`Generated email for ${user.email}: ${emailContent}`);
-        
-        //? send email
-        const results = await sendIndividualEmails(
-          [user.email],
-          fromEmail || "testing@resend.dev"
-        );
-
-        //? log email
-        await logEmailSent({
-          recipientMail: user.email,
-          emailContent: emailContent,
-          status: results.successful ? 'SENT' : 'FAILED',
-          userId: userId,
-          campaignId: campaignId,
-        });
+      // Process emails in batches
+      const results = await processBatchEmails({
+        userDataArray: userData,
+        prompt,
+        fromEmail,
+        userId,
+        campaignId
       });
-
 
       return res.json({
         success: true,
-        message: `Generated and sent ${results.successful} emails, ${results.failed} failed`,
-        results,
-        logs: emailLogs
+        message: `Generated and sent ${results.summary.successful} emails, ${results.summary.failed} failed out of ${results.summary.total} total`,
+        campaign: {
+          id: campaignId,
+          name: campaign.name
+        },
+        summary: results.summary,
+        details: results.emails.map(email => ({
+          recipient: email.recipient.email,
+          success: email.success,
+          ...(email.success ? {
+            subject: email.emailContent.subject,
+            preview: email.emailContent.text.substring(0, 100) + '...',
+            status: email.sendResult.status
+          } : {
+            error: email.error
+          })
+        }))
       });
     } catch (error) {
       console.error("Error in /api/generate-and-send:", error);
