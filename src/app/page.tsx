@@ -4,6 +4,7 @@ import React from "react";
 import { Hero } from "../components/Hero";
 import { Testimonials } from "../components/Testimonials";
 import { Features } from "../components/Features";
+import { Pricing } from "../components/Pricing";
 
 export default function Home() {
   return (
@@ -14,13 +15,11 @@ export default function Home() {
       {/* Features Section */}
       <Features />
 
-      {/* Content Section */}
-      <section className="py-20 bg-dark-space relative">
-        <div className="container relative z-10">
-          {/* Testimonials section */}
-          <Testimonials />
-        </div>
-      </section>
+      {/* Testimonials Section */}
+      <Testimonials />
+
+      {/* Pricing Section */}
+      <Pricing />
     </div>
   );
 }
