@@ -91,7 +91,7 @@ Example Output:
       console.error("Error generating email:", error);
 
       // Fallback to a template if AI generation fails
-      results.push({
+      /* results.push({
         subject: `Special offer for ${clientData.company || "your company"}`,
         text: `Hello ${
           clientData.name || "there"
@@ -99,7 +99,7 @@ Example Output:
         html: `<p>Hello ${
           clientData.name || "there"
         },</p><p>We would like to offer you our email campaign management services.</p><p>Best regards,<br>ECMP Team</p>`,
-      });
+      }); */
     }
   }
 

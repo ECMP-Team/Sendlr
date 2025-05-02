@@ -18,13 +18,12 @@ export async function processUserEmail({ userData, prompt, fromEmail, userId, ca
     // Generate email content
     const [emailContent] = await writeMail(prompt, [userData]);
     console.log(chalk.blue.bgYellow(`Generated email for ${userData.email}: ${JSON.stringify(emailContent)}`));
-
-    // Prepare email for sending
-    const emailData = {
+    // TODO: debug this 
+    const emailData = { //! where does this come from?
       recipient: userData.email,
-      subject: emailContent.subject,
-      text: emailContent.text,
-      html: emailContent.html
+      subject: emailContent?.subject,
+      text: emailContent?.text,
+      html: emailContent?.html
     };
 
     // Send email
@@ -36,7 +35,7 @@ export async function processUserEmail({ userData, prompt, fromEmail, userId, ca
     // Log email
     await logEmailSent({
       recipientMail: userData.email,
-      emailContent: JSON.stringify(emailContent),
+      email_content: JSON.stringify(emailContent),
       status: results.successful > 0 ? 'SENT' : 'FAILED',
       userId: userId,
       campaignId: campaignId,
