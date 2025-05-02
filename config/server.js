@@ -4,14 +4,28 @@ import emailRouter from "../routes/Email.routes.js";
 import userRouter from "../routes/User.routes.js";
 import campaignRouter from "../routes/Campaign.routes.js";
 import { healthCheck } from "../controllers/healthController.js";
+import { errorHandler } from "../middleware/errorMiddleware.js";
 
 const server = (app) => {
     app.use(express.json({ limit: "10mb" }));
     app.use(arcjetMiddleware);
+    
+    // API routes
     app.use("/api/email/", emailRouter);
     app.use("/api/user/", userRouter);
     app.use("/api/campaign/", campaignRouter);
     app.get("/api/health", healthCheck);
+    
+    // Handle 404 for API routes
+    app.all('/api/*', (req, res) => {
+        res.status(404).json({
+            success: false,
+            message: `Route not found: ${req.originalUrl}`
+        });
+    });
+    
+    // Global error handler
+    app.use(errorHandler);
 }
 
 export default server;

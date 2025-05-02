@@ -1,3 +1,5 @@
+import { verifyToken } from "../utils/jwtUtils.js";
+
 const authMiddleware = (req, res, next) => {
     const token = req.headers.authorization;
     if (!token) {

@@ -1,10 +1,10 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { parseFile } from "../utils/excelParser.js";
-import { createIndividualEmails } from "../utils/dataProcessor.js";
-import { sendIndividualEmails } from "../mail/resend.js";
-import { Logger } from "../utils/logger.js";
+import { parseFile } from "../../utils/excelParser.js";
+import { createIndividualEmails } from "../../utils/dataProcessor.js";
+import { sendIndividualEmails } from "../../mail/resend.js";
+import { Logger } from "../../utils/logger.js";
 
 // Get the current file's directory
 const __filename = fileURLToPath(import.meta.url);

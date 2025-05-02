@@ -1,5 +1,6 @@
 import prisma from "../prisma/prismaClient.js";
 import { createToken, verifyToken } from "../utils/jwtUtils.js";
+import bcrypt from "bcrypt";
 class UserController {
 
     /*     static async getAllUsers(req, res) {
