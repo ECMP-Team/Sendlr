@@ -33,13 +33,13 @@ export async function processUserEmail({ userData, prompt, fromEmail, userId, ca
     );
 
     // Log email
-/*     await logEmailSent({
+    await logEmailSent({
       recipientMail: userData.email,
       emailContent: JSON.stringify(emailContent),
       status: results.successful > 0 ? 'SENT' : 'FAILED',
       userId: userId,
       campaignId: campaignId,
-    }); */
+    });
 
     return {
       success: results.successful > 0,

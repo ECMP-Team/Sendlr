@@ -58,8 +58,8 @@ export async function logEmailSent({
   try {
     const emailLog = await prisma.emailSent.create({
       data: {
-        recipient_mail: recipientMail,
-        email_content: emailContent,
+        recipientMail: recipientMail,
+        emailContent: emailContent,
         status,
         userId,
         campaignId
