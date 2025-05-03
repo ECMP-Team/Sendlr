@@ -185,8 +185,8 @@ class emailController {
           recipient: email.recipient.email,
           success: email.success,
           ...(email.success ? {
-            subject: email.emailContent.subject,
-            preview: email.emailContent.text.substring(0, 100) + '...',
+            subject: email.emailContent?.subject,
+            preview: email.emailContent?.text?.substring(0, 100) + '...',
             status: email.sendResult.status
           } : {
             error: email.error

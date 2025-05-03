@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AI_API } from "../config/config.js";
+import chalk from "chalk";
 const genAI = new GoogleGenerativeAI(AI_API);
 
 // Use the latest model
@@ -71,7 +72,7 @@ Your input is a JSON object with the client's details. Your output must be a JSO
 
 Use the following client data:
 
-${clientDataString}
+${JSON.stringify(clientData)}
 
 Example Output:
 {
@@ -80,10 +81,13 @@ Example Output:
 "html": "<p>Hi {{name}},</p>\n<p>I noticed that <strong>{{company}}</strong> is actively involved in {{domain}}, working to {{notes}}. Scaling outreach and engagement can be challenging, especially when managing high-volume email campaigns.</p>\n<p>ECMP automates email writing and bulk sending with AI, helping organizations like yours save time and improve response rates. With our platform, you can craft highly targeted messages and reach more people efficiently.</p>\n<p>Let's set up a quick call to explore how ECMP can support your mission. <a href='[Insert Link]'>Click here to schedule a demo</a>.</p>\n<p>Best,<br>[Your Name]<br>ECMP Team</p>"
 }`;
 
+      console.log(chalk.greenBright(message));
+
       // Send the client data to generate a personalized email
       const result = await chatSession.sendMessage(message);
       const responseText = result.response.text();
-
+      
+      console.log(chalk.blue(responseText));
       // Parse the response to extract the email content
       const emailContent = parseResponseToEmailContent(responseText, clientData);
       results.push(emailContent);
@@ -91,7 +95,7 @@ Example Output:
       console.error("Error generating email:", error);
 
       // Fallback to a template if AI generation fails
-      /* results.push({
+      results.push({
         subject: `Special offer for ${clientData.company || "your company"}`,
         text: `Hello ${
           clientData.name || "there"
@@ -99,7 +103,7 @@ Example Output:
         html: `<p>Hello ${
           clientData.name || "there"
         },</p><p>We would like to offer you our email campaign management services.</p><p>Best regards,<br>ECMP Team</p>`,
-      }); */
+      });
     }
   }
 

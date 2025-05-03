@@ -38,8 +38,8 @@ model Campaign {
 
 model EmailSent {
   emailId             Int       @id @default(autoincrement())
-  recipient_mail String
-  email_content  String    @db.Text
+  recipientMail String
+  emailContent  String    @db.Text
   status         String
   time_stamp     DateTime  @default(now())
   userId         String
