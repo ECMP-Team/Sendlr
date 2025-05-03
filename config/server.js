@@ -1,14 +1,18 @@
 import express from "express";
 import arcjetMiddleware from "../middleware/arcjet.middleware.js";
+import securityMiddleware from "../middleware/security.middleware.js";
 import emailRouter from "../routes/Email.routes.js";
 import userRouter from "../routes/User.routes.js";
 import { healthCheck } from "../controllers/healthController.js";
 import { redisClient } from "../utils/redisUtils.js";
 
 const server = (app) => {
+  // Apply security headers middleware early in the pipeline
+  app.use(securityMiddleware);
+
   app.use(express.json({ limit: "10mb" }));
-  // Re-enabled for better security
-  app.use(arcjetMiddleware);
+  // Re-enabled with fixed middleware
+  app.use(arcjetMiddleware); // Temporarily disabled for curl testing
 
   redisClient.on("connect", () => {
     console.log("🟢 Redis connected");
@@ -23,9 +27,9 @@ const server = (app) => {
   app.get("/api/health", healthCheck);
 
   // Add a test endpoint
-  app.get("/api/test", (req, res) => {
-    res.json({ message: "API is working" });
-  });
+//   app.get("/api/test", (req, res) => {
+//     res.json({ message: "API is working" });
+//   });
 };
 
 export default server;
