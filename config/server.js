@@ -3,6 +3,7 @@ import arcjetMiddleware from "../middleware/arcjet.middleware.js";
 import securityMiddleware from "../middleware/security.middleware.js";
 import emailRouter from "../routes/Email.routes.js";
 import userRouter from "../routes/User.routes.js";
+import campaignRouter from "../routes/Campaign.routes.js";
 import { healthCheck } from "../controllers/healthController.js";
 import { redisClient } from "../utils/redisUtils.js";
 

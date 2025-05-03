@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from "../prisma/prismaClient.js";
 import { Logger } from './logger.js';
-
-const prisma = new PrismaClient();
 
 /**
  * Create a new user or get existing one by email
@@ -60,8 +58,8 @@ export async function logEmailSent({
   try {
     const emailLog = await prisma.emailSent.create({
       data: {
-        recipient_mail: recipientMail,
-        email_content: emailContent,
+        recipientMail: recipientMail,
+        emailContent: emailContent,
         status,
         userId,
         campaignId

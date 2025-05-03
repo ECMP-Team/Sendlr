@@ -1,5 +1,18 @@
+import { isSpoofedBot } from "@arcjet/inspect";
 import aj from "../config/arcjet.js";
+import { ARCJET_ENV } from "../config/config.js";
+
 const arcjetMiddleware = async (req, res, next) => {
+    // Check if we're in development environment and if the request is from Postman
+    const isDevelopment = ARCJET_ENV === 'development';
+    const isPostman = req.headers['user-agent'] && req.headers['user-agent'].includes('Postman');
+
+    // Skip Arcjet protection for Postman in development mode
+    if (isDevelopment && isPostman) {
+        console.log("Bypassing Arcjet protection for Postman in development mode");
+        return next();
+    }
+
     const decision = await aj.protect(req, { requested: 5 }); // Deduct 5 tokens from the bucket
     console.log("Arcjet decision", decision);
   
@@ -17,6 +30,7 @@ const arcjetMiddleware = async (req, res, next) => {
         res.end(JSON.stringify({ error: "Forbidden" }));
         return; // Stop middleware chain
       }
+      return; // Added return statement to prevent calling next() after response is sent
     } else if (decision.results.some(isSpoofedBot)) {
       // Arcjet Pro plan verifies the authenticity of common bots using IP data.
       // Verification isn't always possible, so we recommend checking the decision

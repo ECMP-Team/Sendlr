@@ -34,7 +34,7 @@ export function parseFile(filePath) {
   }
 }
 
-// Example usage:
+/* // Example usage:
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const realDataPath = path.resolve(__dirname, "../mock/realdata.xlsx");
   parseFile(realDataPath)
@@ -48,3 +48,4 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       process.exit(1);
     });
 }
+ */

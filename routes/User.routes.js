@@ -1,8 +1,8 @@
 import { Router } from "express";
 import UserController from "../controllers/userController.js";
-import CampaignController from "../controllers/campaignController.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 const userRouter = Router();
+
 
 // Authentication routes (now using Arcjet for rate limiting)
 userRouter.post("/register-user", UserController.registerUser);
@@ -26,6 +26,7 @@ userRouter.post("/create-campaign", authMiddleware, CampaignController.createCam
 userRouter.delete("/delete-campaign/:id", authMiddleware, UserController.deleteCampaign);
 
 // Commented out routes
+
 //! userRouter.get("/get-all-users/", authMiddleware, UserController.getAllUsers);
 //! userRouter.delete("/delete-user/:id", authMiddleware, UserController.deleteUser);
 
