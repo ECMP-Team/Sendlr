@@ -5,6 +5,7 @@ import { Hero } from "../components/Hero";
 import { Testimonials } from "../components/Testimonials";
 import { Features } from "../components/Features";
 import { Pricing } from "../components/Pricing";
+import { HowItWorks } from "../components/HowItWorks";
 
 export default function Home() {
   return (
@@ -14,6 +15,9 @@ export default function Home() {
 
       {/* Features Section */}
       <Features />
+
+      {/* How It Works Section */}
+      <HowItWorks />
 
       {/* Testimonials Section */}
       <Testimonials />

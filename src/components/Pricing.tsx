@@ -161,9 +161,9 @@ export const Pricing = () => {
                       }`}
                       onClick={() => setBillingCycle("annual")}
                     >
-                      Annual{" "}
+                      Annual
                       <span className="ml-1 text-xs font-bold px-2 py-0.5 rounded-full bg-white/20">
-                        Save 30%
+                        (Save 30%)
                       </span>
                     </button>
                   </div>
