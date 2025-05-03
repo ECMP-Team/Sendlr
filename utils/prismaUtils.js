@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from "../prisma/prismaClient.js";
 import { Logger } from './logger.js';
-
-const prisma = new PrismaClient();
 
 /**
  * Create a new user or get existing one by email
