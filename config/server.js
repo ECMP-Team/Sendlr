@@ -7,7 +7,7 @@ import { redisClient } from "../utils/redisUtils.js";
 
 const server = (app) => {
   app.use(express.json({ limit: "10mb" }));
-  // Temporarily disabled for testing
+  // Re-enabled for better security
   app.use(arcjetMiddleware);
 
   redisClient.on("connect", () => {
@@ -23,9 +23,9 @@ const server = (app) => {
   app.get("/api/health", healthCheck);
 
   // Add a test endpoint
-//   app.get("/api/test", (req, res) => {
-//     res.json({ message: "API is working" });
-//   });
+  app.get("/api/test", (req, res) => {
+    res.json({ message: "API is working" });
+  });
 };
 
 export default server;

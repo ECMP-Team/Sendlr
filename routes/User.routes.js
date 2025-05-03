@@ -2,14 +2,13 @@ import { Router } from "express";
 import UserController from "../controllers/userController.js";
 import CampaignController from "../controllers/campaignController.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import rateLimiter from "../middleware/rateLimiter.middleware.js";
 const userRouter = Router();
 
-// Authentication routes with rate limiting
-userRouter.post("/register", rateLimiter('register'), UserController.registerUser);
-userRouter.post("/login", rateLimiter('login'), UserController.loginUser);
-userRouter.post("/refresh-token", rateLimiter('default'), UserController.refreshToken);
-userRouter.post("/logout", authMiddleware, UserController.logoutUser);
+// Authentication routes (now using Arcjet for rate limiting)
+userRouter.post("/register-user", UserController.registerUser);
+userRouter.post("/login-user", UserController.loginUser);
+userRouter.post("/refresh-token", UserController.refreshToken);
+userRouter.post("/logout-user", authMiddleware, UserController.logoutUser);
 
 // Session management routes
 userRouter.get("/sessions", authMiddleware, UserController.getUserSessions);
