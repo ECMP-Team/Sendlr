@@ -2,6 +2,9 @@ import writeMail from "../api/mailWriter.js";
 import { sendIndividualEmails } from "../mail/resend.js";
 import { logEmailSent } from "./prismaUtils.js";
 import chalk from "chalk";
+import prisma from "../prisma/prismaClient.js";
+import { sendEmail } from "../mail/resend.js";
+import { generateBulkEmails } from "../services/ai/index.js";
 
 /**
  * Processes a single user's email generation and sending
@@ -71,67 +74,101 @@ export async function processUserEmail({ userData, prompt, fromEmail, userId, ca
 }
 
 /**
- * Processes multiple users' emails in batches
- * @param {Object} params - Parameters object
- * @param {Array} params.userDataArray - Array of user data
- * @param {string} params.prompt - Email generation prompt
- * @param {string} params.fromEmail - Sender email address
- * @param {string} params.userId - User ID for logging
- * @param {string} params.campaignId - Campaign ID for logging
- * @param {number} params.batchSize - Size of each batch (default: 5)
- * @returns {Promise<Object>} Aggregated results
+ * Process batch of emails for generation and sending
+ * @param {Object} options - Batch processing options
+ * @param {Array<Object>} options.userDataArray - Array of client data objects
+ * @param {string} options.prompt - Custom prompt for AI
+ * @param {string} options.fromEmail - Sender email address
+ * @param {string} options.userId - User ID for logging
+ * @param {string} options.campaignId - Campaign ID for logging
+ * @returns {Promise<Object>} - Results summary and details
  */
 export async function processBatchEmails({ 
   userDataArray, 
   prompt, 
-  fromEmail, 
+  fromEmail = "testing@resend.dev", 
   userId, 
-  campaignId, 
-  batchSize = 5 
+  campaignId 
 }) {
-  const results = {
-    summary: {
-      total: userDataArray.length,
-      successful: 0,
-      failed: 0
-    },
-    emails: [] // Detailed results for each email
-  };
-
-  // Process in batches
-  for (let i = 0; i < userDataArray.length; i += batchSize) {
-    const batch = userDataArray.slice(i, i + batchSize);
-    console.log(`Processing batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(userDataArray.length / batchSize)}`);
-    
-    // Process batch concurrently
-    const batchResults = await Promise.all(
-      batch.map(userData => 
-        processUserEmail({
-          userData,
-          prompt,
-          fromEmail,
-          userId,
-          campaignId
-        })
-      )
-    );
-
-    // Aggregate results
-    batchResults.forEach(result => {
-      if (result.success) {
-        results.summary.successful++;
-      } else {
-        results.summary.failed++;
+  // Generate email content
+  const generatedEmails = await generateBulkEmails(userDataArray, prompt);
+  
+  // Send emails and keep track of results
+  const emailResults = [];
+  let successCount = 0;
+  let failedCount = 0;
+  
+  // Process each email
+  for (const item of generatedEmails) {
+    try {
+      // Skip if generation failed
+      if (!item.success) {
+        failedCount++;
+        emailResults.push({
+          recipient: { email: item.clientData.email },
+          success: false,
+          error: item.error || "Failed to generate email content"
+        });
+        continue;
       }
-      results.emails.push(result);
-    });
-
-    // Add delay between batches if not the last batch
-    if (i + batchSize < userDataArray.length) {
-      console.log('Waiting 1 second before processing next batch...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const { clientData, emailContent } = item;
+      
+      // Send email
+      const sendResult = await sendEmail({
+        to: clientData.email,
+        from: fromEmail,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html
+      });
+      
+      // Log to database
+      await prisma.emailLog.create({
+        data: {
+          userId,
+          campaignId,
+          recipientEmail: clientData.email,
+          subject: emailContent.subject,
+          content: emailContent.text,
+          status: sendResult.status || "sent",
+          metadata: {
+            clientData,
+            sendResult
+          }
+        }
+      });
+      
+      // Track success
+      successCount++;
+      emailResults.push({
+        recipient: { email: clientData.email },
+        success: true,
+        emailContent,
+        sendResult
+      });
+    } catch (error) {
+      // Track failure
+      failedCount++;
+      emailResults.push({
+        recipient: { email: item.clientData?.email || "unknown" },
+        success: false,
+        error: error.message
+      });
     }
   }
+  
+  // Return results
+  return {
+    summary: {
+      total: userDataArray.length,
+      successful: successCount,
+      failed: failedCount
+    },
+    emails: emailResults
+  };
+}
 
-  return results;
-} 
+export default {
+  processBatchEmails
+}; 
