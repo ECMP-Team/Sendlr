@@ -77,7 +77,7 @@ export const HowItWorks = () => {
 
             <div className="relative w-full">
               <div className="relative z-0 h-14 w-full md:h-[143px]">
-                <div className="hidden md:block h-full w-[calc((100%-10*25px)/3+16px)] absolute top-0 right-1/2">
+                <div className="hidden md:block h-full w-[calc((100%-2*16px)/3+16px)] absolute top-0 right-1/2">
                   <svg className="h-full w-full overflow-visible">
                     <path
                       className="stroke-cyber-blue/30 dark:stroke-white/15"
