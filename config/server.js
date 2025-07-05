@@ -26,7 +26,6 @@ const server = (app) => {
   app.get("/api/health", healthCheck);
   //* ReDoc documentation route
   app.use("/", docsRouter);
-  app.use("/", docsRouter);
 
   // Handle 404 for API routes
   app.all("/api/*", (req, res) => {

@@ -2,8 +2,13 @@ import { Router } from "express";
 import swaggerSpec from "../config/swagger.js";
 
 const docsRouter = Router();
+const specUrl = "/swagger.json";
+docsRouter.get(specUrl, (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+
 docsRouter.get("/redoc", (req, res) => {
-  const specUrl = "/swagger.json"; // Make sure this route exists as shown above
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -16,11 +21,6 @@ docsRouter.get("/redoc", (req, res) => {
       </body>
     </html>
   `);
-});
-
-docsRouter.get('/swagger.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerSpec);
 });
 
 export default docsRouter;
