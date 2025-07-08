@@ -17,7 +17,7 @@ docsRouter.get("/redoc", (req, res) => {
         <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
       </head>
       <body>
-        <redoc spec-url="${specUrl}"></redoc>
+        <redoc spec-url="/swagger.json"></redoc>
       </body>
     </html>
   `);

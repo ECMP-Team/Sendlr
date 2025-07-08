@@ -5,10 +5,12 @@ import userRouter from "../routes/User.routes.js";
 import campaignRouter from "../routes/Campaign.routes.js";
 import { healthCheck } from "../controllers/healthController.js";
 import { errorHandler } from "../middleware/errorMiddleware.js";
+import { bullBoardRouter } from "../queue/queue.js";
 /* import expressOasGenerator from "expressOasGenerator";
  */ import swaggerSpec from "./swagger.js";
 import docsRouter from "../routes/ReDoc.routes.js";
 import swaggerUi from "swagger-ui-express";
+
 const server = (app) => {
   // setup and security middlewares
   app.use(express.json({ limit: "10mb" }));
@@ -17,6 +19,9 @@ const server = (app) => {
   // Initialize expressOasGenerator for OpenAPI documentation
   /*  expressOasGenerator.init(app, {}); */
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+  // Bull Board dashboard for queue monitoring
+  app.use("/admin/queues", bullBoardRouter);
 
   //? API routes
   app.use("/api/email/", emailRouter);

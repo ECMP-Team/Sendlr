@@ -1,44 +1,79 @@
 import { Worker } from 'bullmq';
 import { connection } from './queue.js';
+import { processBatchEmails } from '../utils/emailUtils.js';
+import { addFileProcessingJob, addCampaignProcessingJob } from './queue.js';
+import chalk from 'chalk';
 
-async function doTask(data) {
-  try {
-    console.log('🎯 Starting task for:', data);
-    await new Promise(r => setTimeout(r, 2000)); // simulate delay
-    console.log('✅ Finished task for:', data);
-  } catch (error) {
-    console.error('❌ Task failed:', error);
-    throw error; // Re-throw to let BullMQ handle the retry
-  }
-}
-
-const aiworker = new Worker(
-  'AIQueue', 
+const emailWorker = new Worker(
+  'EmailQueue', 
   async job => {
-    await doTask(job.data);
+    const jobType = job.name;
+    
+    if (jobType === 'process-batch') {
+      // Legacy batch processing
+      console.log(chalk.blue('📧 Starting legacy batch email processing...'));
+      const results = await processBatchEmails(job.data);
+      console.log(chalk.green('✅ Legacy batch processing complete:'), results.summary);
+      return results;
+      
+    } else if (jobType === 'process-campaign') {
+      // New campaign processing using background workers
+      console.log(chalk.blue('🚀 Starting campaign processing with background workers...'));
+      const { filePath, userId, campaignId, prompt, fromEmail } = job.data;
+      
+      // Add file processing job
+      const fileJob = await addFileProcessingJob({
+        filePath,
+        userId,
+        campaignId,
+        prompt,
+        fromEmail,
+        jobId: job.id
+      });
+      
+      console.log(chalk.green(`✅ Campaign processing initiated. File processing job: ${fileJob.id}`));
+      
+      return {
+        success: true,
+        message: 'Campaign processing started',
+        fileProcessingJobId: fileJob.id,
+        campaignId,
+        userId
+      };
+    }
+    
+    throw new Error(`Unknown job type: ${jobType}`);
   }, 
   { 
     connection,
-    concurrency: 5
+    concurrency: 1 // Process one batch/campaign at a time
   }
 );
 
-aiworker.on('completed', job => {
-  console.log(`✨ Job ${job.id} completed successfully`);
+emailWorker.on('completed', job => {
+  const results = job.returnvalue;
+  
+  if (job.name === 'process-batch') {
+    console.log(chalk.green(`✨ Legacy batch job ${job.id} completed. Processed ${results.summary.total} emails (${results.summary.successful} successful, ${results.summary.failed} failed)`));
+  } else if (job.name === 'process-campaign') {
+    console.log(chalk.green(`✨ Campaign job ${job.id} initiated successfully. File processing started.`));
+  }
 });
 
-aiworker.on('failed', (job, err) => {
-  console.error(`❌ Job ${job?.id} failed:`, err);
+emailWorker.on('failed', (job, err) => {
+  console.error(chalk.red(`❌ Job ${job?.id} failed:`, err));
 });
 
-aiworker.on('error', err => {
-  console.error('🚨 Worker error:', err);
+emailWorker.on('error', err => {
+  console.error(chalk.red('🚨 Email Worker error:', err));
 });
 
 process.on('SIGTERM', async () => {
-  console.log('Shutting down worker gracefully...');
-  await aiworker.close();
+  console.log('Shutting down email worker gracefully...');
+  await emailWorker.close();
   process.exit(0);
 });
 
-console.log('🚀 AIWorker started and ready to process jobs');
+console.log(chalk.blue('🚀 Email Worker started and ready to process jobs'));
+
+export default emailWorker;

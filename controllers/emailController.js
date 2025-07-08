@@ -3,6 +3,13 @@ import writeMail from "../api/mailWriter.js";
 import { logEmailSent } from "../utils/prismaUtils.js";
 import { parseFile } from "../utils/excelParser.js";
 import { processBatchEmails } from "../utils/emailUtils.js";
+import { 
+  addEmailBatchToQueue, 
+  addCampaignProcessingJob,
+  addFileProcessingJob,
+  addAIGenerationJob,
+  addEmailSendingJob 
+} from "../queue/queue.js";
 import chalk from "chalk";
 import prisma from "../prisma/prismaClient.js";
 
@@ -114,9 +121,9 @@ class emailController {
     }
   };
 
-  // Endpoint to generate AI email content and send individualized emails
+  // Updated method to use background workers for campaign processing
   /**
-   * Generates email content for a list of clients and sends the emails.
+   * Generates email content for a list of clients and sends the emails using background workers.
    *
    * @async
    * @function generateAndSendEmails
@@ -126,10 +133,10 @@ class emailController {
    * @param {string} [req.body.fromEmail] - The sender's email address. Defaults to "testing@resend.dev" if not provided.
    * @param {string} req.body.prompt - The prompt used to generate email content.
    * @param {Object} res - The response object.
-   * @returns {Promise<void>} Sends a JSON response with the status and results of the email generation and sending process.
+   * @returns {Promise<void>} Sends a JSON response with the job information for background processing.
    *
    * @throws {Error} Returns a 400 status if `userData` is missing, not an array, or empty.
-   * @throws {Error} Returns a 500 status if an error occurs during email generation or sending.
+   * @throws {Error} Returns a 500 status if an error occurs during job creation.
    */
   static async generateAndSendEmails(req, res) {
     const userId = req.user.id;
@@ -139,7 +146,8 @@ class emailController {
         campaignId, 
         userData, // array of objects containing email for each client and free data
         fromEmail, // optional, default is "testing@resend.dev"
-        prompt // optional
+        prompt, // optional
+        useBackgroundWorkers = true // New flag to choose processing method
       } = req.body;
 
       if (!userData || !Array.isArray(userData) || userData.length === 0) {
@@ -164,35 +172,86 @@ class emailController {
         });
       }
 
-      // Process emails in batches
-      const results = await processBatchEmails({
-        userDataArray: userData,
-        prompt,
-        fromEmail,
-        userId,
-        campaignId
-      });
+      if (useBackgroundWorkers) {
+        // New background worker approach
+        console.log(chalk.blue(`🚀 Starting background processing for campaign ${campaign.name} with ${userData.length} recipients`));
+        
+        // Create batches for AI processing
+        const batchSize = 5;
+        const batches = [];
+        
+        for (let i = 0; i < userData.length; i += batchSize) {
+          const batch = userData.slice(i, i + batchSize);
+          batches.push({
+            batchNumber: Math.floor(i / batchSize) + 1,
+            totalBatches: Math.ceil(userData.length / batchSize),
+            userData: batch,
+            userId,
+            campaignId,
+            prompt,
+            fromEmail,
+            originalJobId: `campaign_${campaignId}_${Date.now()}`
+          });
+        }
 
-      return res.json({
-        success: true,
-        message: `Generated and sent ${results.summary.successful} emails, ${results.summary.failed} failed out of ${results.summary.total} total`,
-        campaign: {
-          id: campaignId,
-          name: campaign.name
-        },
-        summary: results.summary,
-        details: results.emails.map(email => ({
-          recipient: email.recipient.email,
-          success: email.success,
-          ...(email.success ? {
-            subject: email.emailContent?.subject,
-            preview: email.emailContent?.text?.substring(0, 100) + '...',
-            status: email.sendResult.status
-          } : {
-            error: email.error
-          })
-        }))
-      });
+        // Add AI generation jobs for each batch
+        const aiJobs = await Promise.all(
+          batches.map(batch => addAIGenerationJob(batch))
+        );
+
+        return res.json({
+          success: true,
+          message: `Campaign processing started in background. Processing ${userData.length} recipients in ${batches.length} batches.`,
+          campaign: {
+            id: campaignId,
+            name: campaign.name
+          },
+          processing: {
+            method: 'background_workers',
+            totalRecipients: userData.length,
+            batchesCreated: batches.length,
+            aiJobIds: aiJobs.map(job => job.id)
+          },
+          monitoring: {
+            dashboard: '/admin/queues',
+            message: 'Visit the queue dashboard to monitor progress'
+          }
+        });
+        
+      } else {
+        // Legacy synchronous approach
+        console.log(chalk.yellow(`⚠️ Using legacy synchronous processing for campaign ${campaign.name}`));
+        
+        const results = await processBatchEmails({
+          userDataArray: userData,
+          prompt,
+          fromEmail,
+          userId,
+          campaignId
+        });
+
+        return res.json({
+          success: true,
+          message: `Generated and sent ${results.summary.successful} emails, ${results.summary.failed} failed out of ${results.summary.total} total`,
+          campaign: {
+            id: campaignId,
+            name: campaign.name
+          },
+          summary: results.summary,
+          details: results.emails.map(email => ({
+            recipient: email.recipient.email,
+            success: email.success,
+            ...(email.success ? {
+              subject: email.emailContent?.subject,
+              preview: email.emailContent?.text?.substring(0, 100) + '...',
+              status: email.sendResult.status
+            } : {
+              error: email.error
+            })
+          }))
+        });
+      }
+      
     } catch (error) {
       console.error("Error in /api/generate-and-send:", error);
       return res.status(500).json({
@@ -203,6 +262,79 @@ class emailController {
     }
   };
 
+  // New method for file-based campaign processing
+  static async processFileBasedCampaign(req, res) {
+    const userId = req.user.id;
+
+    try {
+      const { 
+        campaignId, 
+        filePath,
+        fromEmail,
+        prompt
+      } = req.body;
+
+      if (!filePath) {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide a file path for processing",
+        });
+      }
+
+      // Check if campaign exists
+      const campaign = await prisma.campaign.findUnique({
+        where: {
+          id: campaignId,
+          userId: userId
+        }
+      });
+      
+      if (!campaign) {
+        return res.status(404).json({
+          success: false,
+          message: "Campaign not found",
+        });
+      }
+
+      console.log(chalk.blue(`🚀 Starting file-based campaign processing for ${campaign.name}`));
+
+      // Add campaign processing job
+      const campaignJob = await addCampaignProcessingJob({
+        filePath,
+        userId,
+        campaignId,
+        prompt,
+        fromEmail
+      });
+
+      return res.json({
+        success: true,
+        message: `File-based campaign processing started in background.`,
+        campaign: {
+          id: campaignId,
+          name: campaign.name
+        },
+        processing: {
+          method: 'file_based_workers',
+          filePath,
+          jobId: campaignJob.id
+        },
+        monitoring: {
+          dashboard: '/admin/queues',
+          message: 'Visit the queue dashboard to monitor progress'
+        }
+      });
+
+    } catch (error) {
+      console.error("Error in file-based campaign processing:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error processing file-based campaign",
+        error: error.message,
+      });
+    }
+  }
+
   static async convertToJson(req, res) {
     const { excelData } = req.body;
     // Convert Excel data to JSON
@@ -212,9 +344,33 @@ class emailController {
       message: "Excel data converted to JSON",
       jsonData,
     });
-
   }
 
+  // New method to check job status
+  static async getJobStatus(req, res) {
+    try {
+      const { jobId } = req.params;
+      
+      // This would need to be implemented to check job status across queues
+      // For now, return a placeholder response
+      return res.json({
+        success: true,
+        message: "Job status checking not yet implemented",
+        jobId,
+        monitoring: {
+          dashboard: '/admin/queues',
+          message: 'Visit the queue dashboard to check job status'
+        }
+      });
+    } catch (error) {
+      console.error("Error checking job status:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error checking job status",
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default emailController;

@@ -113,6 +113,8 @@ userRouter.put("/update-user", authMiddleware, UserController.updateUser);
  *                       type: string
  *                     name:
  *                       type: string
+ *                     userData:
+ *                       type: object
  */
 userRouter.post("/register-user", UserController.registerUser);
 
