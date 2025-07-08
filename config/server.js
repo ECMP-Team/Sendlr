@@ -7,9 +7,8 @@ import { healthCheck } from "../controllers/healthController.js";
 import { errorHandler } from "../middleware/errorMiddleware.js";
 /* import expressOasGenerator from "expressOasGenerator";
  */ import swaggerSpec from "./swagger.js";
-import swaggerUi from "swagger-ui-express";
 import docsRouter from "../routes/ReDoc.routes.js";
-
+import swaggerUi from "swagger-ui-express";
 const server = (app) => {
   // setup and security middlewares
   app.use(express.json({ limit: "10mb" }));

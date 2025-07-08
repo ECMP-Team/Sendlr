@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq';
-import { connection } from './queue';
+import { connection } from './queue.js';
 
 async function doTask(data) {
   console.log('🎯 Starting task for:', data)

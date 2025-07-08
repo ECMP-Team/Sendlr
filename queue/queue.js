@@ -1,4 +1,4 @@
-import { REDIS_HOST, REDIS_PASSWORD, REDIS_PORT } from "../config/config";
+import { REDIS_HOST, REDIS_PASSWORD, REDIS_PORT } from "../config/config.js";
 import IORedis from 'ioredis';
 import { Queue } from 'bullmq';
 console.log('Connecting to Redis at:', REDIS_HOST, REDIS_PORT);
