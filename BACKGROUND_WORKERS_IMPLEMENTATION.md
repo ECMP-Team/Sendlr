@@ -21,7 +21,6 @@ File Upload → File Processing Worker → AI Generation Worker → Email Sendin
    - Validates email addresses
    - Creates batches for AI processing
    - Concurrency: 2 files simultaneously
-
 2. **AI Generation Worker** (`queue/workers/aiGenerationWorker.js`)
    - Generates personalized email content using Gemini AI
    - Processes user data in batches

@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ecmp-postgres
+    environment:
+      POSTGRES_DB: ecmp
+      POSTGRES_USER: ecmp_user
+      POSTGRES_PASSWORD: ecmp_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ecmp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecmp_user -d ecmp"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for BullMQ
+  redis:
+    image: redis:7-alpine
+    container_name: ecmp-redis
+    command: redis-server --requirepass redis_password
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - ecmp-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_password", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Main API Application
+  api:
+    build: .
+    container_name: ecmp-api
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgres://ecmp_user:ecmp_password@postgres:5432/ecmp
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis_password
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - AI_API=${AI_API}
+      - JWT_SECRET=${JWT_SECRET}
+      - ARCJET_KEY=${ARCJET_KEY}
+      - ARCJET_ENV=production
+      - MAX_FILE_SIZE=10mb
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ecmp-network
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+
+  # Background Workers
+  workers:
+    build: .
+    container_name: ecmp-workers
+    environment:
+      - DATABASE_URL=postgres://ecmp_user:ecmp_password@postgres:5432/ecmp
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis_password
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - AI_API=${AI_API}
+      - JWT_SECRET=${JWT_SECRET}
+      - ARCJET_KEY=${ARCJET_KEY}
+      - ARCJET_ENV=production
+    command: ["npm", "run", "workers:start"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ecmp-network
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ecmp-network:
+    driver: bridge
