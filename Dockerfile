@@ -20,13 +20,6 @@ RUN npx prisma generate
 # Copy application code
 COPY . .
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
-
-# Change ownership of the app directory
-RUN chown -R nextjs:nodejs /app
-USER nextjs
 
 # Expose port
 EXPOSE 3000
