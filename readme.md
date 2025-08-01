@@ -56,7 +56,7 @@
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/ECMP-Team/Sendlr.git
 cd ecmp
 
 # Install dependencies
