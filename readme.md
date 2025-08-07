@@ -328,7 +328,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Built with ❤️ By Yasser Dalali, Yasin Mazhare and Nouredinne Achbili. 2025**
+**Built with ❤️ By Yasser Dalali 2025**
 
 [⭐ Star this repo](../../stargazers) • [🐛 Report Bug](../../issues) • [💡 Request Feature](../../issues)
 
